@@ -1,0 +1,69 @@
+﻿@page "/"
+@inject OpvService opvService
+@using BlazorBootstrap
+@using OPVs.Servicios
+@using models
+
+<PageTitle>Buscar OPVs</PageTitle>
+
+<h3>Buscar OPVs</h3>
+
+<div class="container mt-4">
+    <EditForm Model="@searchModel" OnValidSubmit="@SearchOPVs">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="startDate" class="form-label">Fecha de Inicio</label>
+            <InputDate id="startDate" class="form-control" @bind-Value="searchModel.StartDate" />
+        </div>
+
+        <div class="mb-3">
+            <label for="endDate" class="form-label">Fecha Final</label>
+            <InputDate id="endDate" class="form-control" @bind-Value="searchModel.EndDate" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </EditForm>
+
+    @if (opvs != null)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fecha OPV</th>
+                    <th>Empresa</th>
+                    <th>Mercado</th>
+                    <th>Valor de la OPV</th>
+                    <th>Precio de salida</th>
+                    <th>Último</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var opv in opvs)
+                {
+                    <tr>
+                        <td>@opv.fecha.ToString("dd.MM.yyyy")</td>
+                        <td>@opv.empresa</td>
+                        <td>@opv.mercado</td>
+                        <td>@opv.valor</td>
+                        <td>@opv.precioSalida</td>
+                        <td>@opv.precioUltimoCierre</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private SearchModel searchModel = new SearchModel();
+    private List<Opv> opvs;
+
+    private async Task SearchOPVs()
+    {
+        opvs = await opvService.GetOpvsAsync(searchModel.StartDate, searchModel.EndDate);
+    }
+
+
+}
