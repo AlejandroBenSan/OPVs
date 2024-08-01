@@ -56,13 +56,36 @@
     }
 </div>
 
+<Preload LoadingText="Cargando OPVs" />
+
+<Toasts class="p-3" AutoHide="true" Delay="3000" Placement="ToastsPlacement.TopRight" />
+
 @code {
+    [Inject] protected PreloadService PreloadService { get; set; } = default!;
+    [Inject] protected ToastService ToastService { get; set; } = default!;
+
+
     private SearchModel searchModel = new SearchModel();
     private List<Opv> opvs;
 
     private async Task SearchOPVs()
     {
-        opvs = await opvService.GetOpvsAsync(searchModel.StartDate, searchModel.EndDate);
+        try
+        {
+            PreloadService.Show();
+            opvs = await opvService.GetOpvsAsync(searchModel.StartDate, searchModel.EndDate);
+
+        }catch(Exception ex)
+        {
+            ToastService.Notify(new(ToastType.Danger, ex.Message));
+        }
+        finally
+        {
+            PreloadService.Hide();
+            ToastService.Notify(new(ToastType.Success, $"{opvs.Count} OPVs cargados con exito"));
+            
+        }
+        
     }
 
 
