@@ -28,41 +28,57 @@
 
     @if (opvs != null)
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Fecha OPV</th>
-                    <th>Empresa</th>
-                    <th>Mercado</th>
-                    <th>Valor de la OPV</th>
-                    <th>Precio de salida</th>
-                    <th>Último</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var opv in opvs)
-                {
-                    <tr>
-                        <td>@opv.fecha.ToString("dd.MM.yyyy")</td>
-                        <td>@opv.empresa</td>
-                        <td>@opv.mercado</td>
-                        <td>@opv.valor</td>
-                        <td>@opv.precioSalida</td>
-                        <td>@opv.precioUltimoCierre</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div style="margin-top: 20px">
+            <Grid @ref="grid" 
+            TItem="Opv"
+              Class="table table-hover table-bordered table-striped"
+              AllowPaging="true"
+              PageSize="10"
+              Data="opvs"
+              Responsive="true">
+
+            <GridColumns>
+                <GridColumn TItem="Opv" HeaderText="Fecha" PropertyName="Fecha" FilterTextboxWidth="80">
+                    @context.fecha.ToString("dd/MM/yyyy")
+                </GridColumn>
+                <GridColumn TItem="Opv" HeaderText="Empresa" PropertyName="Empresa" FilterTextboxWidth="80">
+                    @context.empresa
+                </GridColumn>
+                    <GridColumn TItem="Opv" HeaderText="Ticket" PropertyName="Ticket" FilterTextboxWidth="80">
+                        @context.ticket
+                    </GridColumn>
+                    <GridColumn TItem="Opv" HeaderText="Enlace" PropertyName="Enlace" FilterTextboxWidth="80">
+                        @context.enlace
+                    </GridColumn>
+                <GridColumn TItem="Opv" HeaderText="Mercado" PropertyName="Mercado" FilterTextboxWidth="80">
+                    @context.mercado
+                </GridColumn>
+                <GridColumn TItem="Opv" HeaderText="Valor" PropertyName="Valor">
+                    @context.valor
+                </GridColumn>
+                <GridColumn TItem="Opv" HeaderText="Precio de Salida" TextNoWrap="true" PropertyName="PrecioSalida">
+                    @context.precioSalida
+                </GridColumn>
+                <GridColumn TItem="Opv" HeaderText="Precio Último Cierre" TextNoWrap="true" PropertyName="PrecioUltimoCierre">
+                    @context.precioUltimoCierre
+                </GridColumn>
+            </GridColumns>
+        </Grid>
+
+        <Button Color="ButtonColor.Success" @onclick="analizarOPVs"> Analizar datos </Button>
+    </div>
     }
 </div>
 
-<Preload LoadingText="Cargando OPVs" />
+<Preload />
 
 <Toasts class="p-3" AutoHide="true" Delay="3000" Placement="ToastsPlacement.TopRight" />
 
 @code {
     [Inject] protected PreloadService PreloadService { get; set; } = default!;
     [Inject] protected ToastService ToastService { get; set; } = default!;
+
+    BlazorBootstrap.Grid<Opv> grid = default!;
 
 
     private SearchModel searchModel = new SearchModel();
@@ -72,7 +88,7 @@
     {
         try
         {
-            PreloadService.Show();
+            PreloadService.Show(SpinnerColor.Light, "Cargando OPVs...");
             opvs = await opvService.GetOpvsAsync(searchModel.StartDate, searchModel.EndDate);
 
         }catch(Exception ex)
@@ -86,6 +102,13 @@
             
         }
         
+    }
+
+    private async Task analizarOPVs()
+    {
+        PreloadService.Show(SpinnerColor.Light, "Analizando los datos...");
+        await Task.Delay(3000); // call the service/api
+        PreloadService.Hide();
     }
 
 

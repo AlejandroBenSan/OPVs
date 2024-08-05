@@ -10,6 +10,8 @@ namespace OPVs.models
     {
         public DateTime fecha { get; set; }
         public string empresa { get; set; }
+        public string ticket { get; set; }
+        public string enlace { get; set; }
         public string mercado { get; set; }
         public string valor { get; set; }
         public float precioSalida { get; set; }

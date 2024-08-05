@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using OPVs.Servicios;
 
 namespace OPVs
@@ -14,6 +15,12 @@ namespace OPVs
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
+
+            builder
+            .Configuration
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            builder.Services.AddSingleton<ApiService>();
 
             builder.Services.AddMauiBlazorWebView();
 
